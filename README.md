@@ -50,6 +50,41 @@ Optional configuration: copy `.env.example` to `.env`. `MOCK_DELAY_MS` sets the 
 5. Repeat with **15 minutes** if desired. Every upstream data request takes at most 18 seconds, plus local processing overhead.
 6. For crash recovery, start a pull, stop the server partway through, and start it again. The saved cursor resumes the unfinished pull. Do not delete the database.
 
+## Architecture
+
+```mermaid
+sequenceDiagram
+    participant UI as Next.js dashboard
+    participant API as Node API server
+    participant DB as SQLite
+    participant Worker as Background importer
+    participant BSE as Mock BSE API
+    UI->>API: GET /api/trades + connect WS /ws
+    API->>DB: Read committed trades
+    API-->>UI: Existing trades immediately
+    UI->>API: POST /api/pulls
+    API->>DB: Persist import job
+    API-->>UI: 202 Accepted + job ID
+    API->>Worker: Wake importer after response
+    loop 50 data pages without status polling
+        Worker->>BSE: GET /getTrades?batch=N&page=P
+        BSE-->>Worker: 100 trades, at most 18s configured delay
+        Worker->>DB: Stage page + save resume cursor
+        API-->>UI: WebSocket progress event
+    end
+    Worker->>DB: Atomically publish trades + complete job
+    API-->>UI: WebSocket snapshot with new trades
+```
+
+The Next.js app, API and importer run in **one always-on Node process**; the diagram shows their logical responsibilities. SQLite stores committed trades, import jobs and staged pages on persistent disk.
+
+- **Immediate dashboard:** reads use saved trades while a background import runs.
+- **Short HTTP requests:** the start request returns immediately; paginated upstream reads stay below the simulated 30-second cutoff.
+- **Safe recovery:** each page and cursor are saved together. Restart resumes unfinished work; new trades become visible only after the whole import commits.
+- **Automatic updates:** WebSockets push progress and the completed dataset to open dashboards, without refresh, status polling or a cron scheduler.
+
+The network assumptions below are part of this design. The [detailed architecture note](docs/ARCHITECTURE.md) covers retries, deduplication and reconnect behavior.
+
 ## The important network assumption
 
 The screenshot specifies an upstream pull that may take 15 minutes and a network that kills **every HTTP connection older than 30 seconds**. A single delayed HTTP response cannot complete under both conditions. Putting the same request in a queue, increasing a client timeout, sending SSE heartbeats, or using `async/await` does not remove an absolute network deadline.

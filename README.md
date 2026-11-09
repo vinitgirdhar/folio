@@ -1,48 +1,45 @@
-# Folio · Trade desk
+# Folio — BSE Trade Import Assessment
 
-A responsive, Apple-inspired BSE trading dashboard for the software engineer assessment. Next.js + React + TypeScript, a persistent SQLite database, background imports, WebSocket updates, and GSAP motion. Light and true-black themes, liquid-glass surfaces, derived charts, search/filter/pagination, CSV export, and import history are included.
+Implementation of the Software Engineer technical assessment: a mock BSE API and a dashboard that displays saved trades immediately and receives new trades automatically when an import completes.
 
-**All records and prices are synthetic. This app does not place orders or connect to the real BSE.**
+All records are synthetic. No real exchange connection or order execution is included.
 
-## Product walkthrough
+## Problem statement
 
-A 90-second walkthrough of the problem, live import flow, dashboard and API, with English narration. Play the video below and enable audio with the player's volume control.
+A full trade pull can take up to 15 minutes, while the network terminates HTTP connections held open longer than 30 seconds. The dashboard must remain available during a pull and update on completion without a page refresh, polling loop or cron scheduler.
+
+## Implementation
+
+| Requirement | Implementation |
+| --- | --- |
+| Mock `GET /getTrades` | 5,000 deterministic records with configurable delay up to 15 minutes |
+| Dashboard opens during a pull | Reads previously committed trades from SQLite |
+| Automatic completion updates | WebSocket progress events and a completed trade snapshot |
+| No polling or cron | An event starts the importer; unfinished jobs resume on startup |
+| Documentation | Setup instructions, architecture diagram and demo video below |
+
+The dashboard also provides search, symbol/side filters, sorting, pagination, CSV export, import history and visible progress.
+
+## Demo video
+
+A 90-second walkthrough of the problem, dashboard, import flow and APIs. Use the player's volume control to enable narration.
 
 https://github.com/user-attachments/assets/0d169ed4-6eda-4d11-86f6-11360180a98b
 
-[Download the original MP4](docs/folio-launch.mp4)
+[Download the video](docs/folio-launch.mp4)
 
-Music: “Happy Beats / Business Moves Vol. 12” by Sascha Ende, [ende.app](https://ende.app/en), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Trimmed and faded beneath the narration.
+## Setup
 
-## Dashboard preview
-
-![Folio dashboard in light mode](docs/preview-light.png)
-
-<details>
-<summary>Dark mode preview</summary>
-
-![Folio dashboard in dark mode](docs/preview-dark.png)
-
-</details>
-
-The glass optics reuse [deepika-builds/liquid-glass](https://github.com/deepika-builds/liquid-glass), vendored at a pinned commit with its MIT licence preserved. [Third-party notice](THIRD_PARTY_NOTICES.md) describes the integration and browser fallback. No CDN or extra runtime dependency is required.
-
-The floating toolbar's **Workspace options** menu holds import history, full CSV export and help. Import history is collapsed by default. Every dropdown is custom styled and supports arrows, Home/End, typeahead, Enter, Escape and outside dismissal. The time header sorts the table. Scrollbars are hidden while touch, trackpad and keyboard scrolling remain available; overflowing tables show edge fades, an animated discovery hint and functional left/right controls. Reduced-motion preferences disable the motion.
-
-During an import, a prominent activity card shows an animated ring, waveform and progress bar using the actual server percentage. **Pull in progress**, the toolbar indicator and **View progress** open a larger live view. The dashboard stays usable; disconnection pauses the activity animation and labels the last confirmed progress. Completion turns the card green with the number of added trades and a dismiss control.
-
-The [assignment compliance audit](docs/ASSIGNMENT_AUDIT.md) maps every required item to its implementation and evidence. A [Trading Session Replay proposal](docs/NEXT_FEATURE.md) is kept separate; no extra product feature is implemented in this baseline.
-
-## Run locally
-
-Requires Node **22.13+ on the 22.x line, or Node 24+** and npm. Tested on Node 22.23.4 / Windows. Node 22's built-in SQLite emits an experimental warning; this is expected.
+Requires npm and Node.js 22.13+ on the 22.x line, or Node.js 24+. Tested on Windows with Node.js 22.23.4. Node 22 may display an experimental warning for its built-in SQLite module.
 
 ```sh
+git clone https://github.com/vinitgirdhar/folio.git
+cd folio
 npm ci
 npm run dev
 ```
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The database is created at `data/folio.sqlite` and seeded with **5,000 trades, 6 symbols, and 120 clients**. No database service, API key, or account is needed.
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The application creates `data/folio.sqlite` and seeds 5,000 trades across 6 symbols and 120 clients. No database service or API key is required.
 
 For a production build:
 
@@ -51,18 +48,31 @@ npm run build
 npm start
 ```
 
-Optional configuration: copy `.env.example` to `.env`. `MOCK_DELAY_MS` sets the default duration from `0` to `900000` milliseconds. `PORT`, `HOST` (`127.0.0.1` or `0.0.0.0`), and `DATABASE_PATH` are also configurable. The pull dialog offers instant, 12-second, 35-second, and 15-minute demonstrations without changing configuration. Server-side edits require restarting `npm run dev`; Next.js hot-reloads the frontend.
+Copy `.env.example` to `.env` to override the defaults. Restart the server after changing configuration.
 
-## Demonstrate the assignment
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `PORT` | `3000` | HTTP and WebSocket server port |
+| `HOST` | `127.0.0.1` | Bind address; `0.0.0.0` is also supported |
+| `DATABASE_PATH` | `./data/folio.sqlite` | Persistent SQLite database |
+| `MOCK_DELAY_MS` | `12000` | Default pull duration, from `0` to `900000` milliseconds |
 
-1. Open the dashboard in two browser tabs. Both immediately read the previously saved trades.
-2. Select **Pull trades → 35 seconds → Start pull**. Acceptance returns HTTP 202 immediately.
-3. Keep searching or filtering. Open a third tab during the import; it also sees the existing dataset.
-4. When the import completes, all tabs show 5,000 additional trades automatically. No refresh, status polling, or scheduler is used.
-5. Repeat with **15 minutes** if desired. Every upstream data request takes at most 18 seconds, plus local processing overhead.
-6. For crash recovery, start a pull, stop the server partway through, and start it again. The saved cursor resumes the unfinished pull. Do not delete the database.
+The dashboard offers instant, 12-second, 35-second and 15-minute imports.
+
+## Verify the assessment flow
+
+1. Open the dashboard in two tabs. Both display saved trades.
+2. Select **Pull trades → 35 seconds → Start pull**. The start request returns HTTP 202 immediately.
+3. Search or filter existing trades while progress updates arrive. Open another tab during the pull to confirm saved data remains available.
+4. On completion, every open dashboard receives 5,000 additional trades automatically.
+5. Select the 15-minute duration to exercise the maximum configured delay.
+6. To check recovery, stop the server during a pull and restart it against the same database. The importer resumes from its saved cursor.
+
+The 35-second option demonstrates an import that outlasts the simulated HTTP lifetime. A full, unpaginated `/getTrades` request with that delay is terminated at the 30-second cutoff.
 
 ## Architecture
+
+**Stack:** Next.js, React and TypeScript for the dashboard; a custom Node.js HTTP server, SQLite storage and WebSockets for import processing and delivery.
 
 ```mermaid
 sequenceDiagram
@@ -88,37 +98,38 @@ sequenceDiagram
     API-->>UI: WebSocket snapshot with new trades
 ```
 
-The Next.js app, API and importer run in **one always-on Node process**; the diagram shows their logical responsibilities. SQLite stores committed trades, import jobs and staged pages on persistent disk.
+The application, API and importer run in one always-on Node process. SQLite keeps committed trades, staged pages and import jobs on persistent disk.
 
-- **Immediate dashboard:** reads use saved trades while a background import runs.
-- **Short HTTP requests:** the start request returns immediately; paginated upstream reads stay below the simulated 30-second cutoff.
-- **Safe recovery:** each page and cursor are saved together. Restart resumes unfinished work; new trades become visible only after the whole import commits.
-- **Automatic updates:** WebSockets push progress and the completed dataset to open dashboards, without refresh, status polling or a cron scheduler.
+- **Independent reads:** saved trades remain available while incoming pages are staged separately.
+- **Durable progress:** each page and its resume cursor are saved together.
+- **Atomic publication:** the completed batch becomes visible in one transaction. Failed imports preserve existing trades.
+- **Duplicate protection:** deterministic trade IDs prevent duplicate inserts, and concurrent start requests reuse the running job.
+- **Live delivery:** WebSockets push progress and completion. Reconnecting clients receive a current snapshot.
 
-The network assumptions below are part of this design. The [detailed architecture note](docs/ARCHITECTURE.md) covers retries, deduplication and reconnect behavior.
+### Network assumptions
 
-## The important network assumption
+The mock retains the requested slow full-export endpoint and adds pagination on that same endpoint. The importer reads 50 pages of 100 records, dividing the configured delay across them. At the 15-minute setting, each page has an 18-second configured delay. These requests retrieve data; they do not poll job status.
 
-The screenshot specifies an upstream pull that may take 15 minutes and a network that kills **every HTTP connection older than 30 seconds**. A single delayed HTTP response cannot complete under both conditions. Putting the same request in a queue, increasing a client timeout, sending SSE heartbeats, or using `async/await` does not remove an absolute network deadline.
+This design assumes the upstream supports bounded paginated reads from an immutable snapshot and the network permits persistent WebSocket connections. If the real upstream only provides one blocking 15-minute HTTP response, pagination, an asynchronous export/callback, or a network change is required. A background worker alone cannot bypass an absolute connection deadline.
 
-This repository preserves the requested **slow `GET /getTrades`** endpoint and also supplies an explicit **paginated extension on that same endpoint**. The importer consumes 50 actual data pages, each containing 100 records, with the total configured delay divided across the pages. It never polls a job status endpoint. The server enforces a 30-second HTTP response lifetime to demonstrate why the legacy full request fails but paginated import works.
+[Detailed architecture and failure handling](docs/ARCHITECTURE.md)
 
-**For a real exchange, confirm that pagination with a stable snapshot is available. If it only offers one blocking 15-minute response, the upstream must provide an asynchronous export/callback or the network must allow that request. This implementation does not claim to solve an impossible upstream contract unchanged.** Browser WebSockets also require the network to permit HTTP upgrades and persistent upgraded connections.
+## API reference
 
-## API
+Base URL: `http://127.0.0.1:3000`.
 
 | Endpoint | Behavior |
 | --- | --- |
-| `GET /getTrades?delayMs=12000&batch=1` | Full mock export: 5,000 deterministic trades after the requested delay. At durations ≥30 seconds the demo network cutoff terminates it. |
-| `GET /getTrades?delayMs=900000&batch=1&page=0` | Paginated mock export: 100 deterministic trades, 18-second delay; pages `0`–`49`. A fixed batch identifies an immutable snapshot. |
-| `GET /api/trades` | Immediate saved trades, latest 20 pulls, and total. Unaffected by staged imports. |
-| `POST /api/pulls` | JSON body `{ "delayMs": 12000 }` (optional). Durable job, HTTP 202, `Location` header. Concurrent requests reuse the active job. |
-| `GET /api/pulls/:id` | Manual inspection/debugging; **never polled by the dashboard**. |
-| `WS /ws` | Initial authoritative snapshot; progress events; complete snapshot after commit. Reconnection gets a fresh snapshot. |
+| `GET /getTrades?delayMs=12000&batch=1` | Returns 5,000 seeded trades after the requested delay; subject to the 30-second cutoff |
+| `GET /getTrades?delayMs=900000&batch=1&page=0` | Returns 100 trades from a fixed batch; page indices are `0`–`49` |
+| `GET /api/trades` | Returns committed trades, the latest 20 imports and the total trade count |
+| `POST /api/pulls` | Starts an import; optional JSON body: `{ "delayMs": 12000 }`; returns HTTP 202 and a job ID |
+| `GET /api/pulls/:id` | Returns job details for manual inspection; the dashboard does not poll this endpoint |
+| `WS /ws` | Delivers an initial snapshot, progress events and the completed trade snapshot |
 
-Trade schema: `id`, `client`, `symbol`, `side`, `quantity`, `pricePaise`, `timestamp`. Integer paise avoid floating-point storage of prices; quantities are integral shares and timestamps are ISO UTC, displayed in IST. Gross turnover is a sum of trade notionals, not portfolio value or P&L. Symbol changes compare the first and latest saved trade for that symbol. The chart shows cumulative gross turnover, with turnover bars per interval. The date is intentionally the fixed mock session, not live exchange time.
+Trade fields: `id`, `client`, `symbol`, `side`, `quantity`, `pricePaise`, `timestamp`. Prices are stored as integer paise; timestamps are ISO UTC and displayed in IST. Charts and totals come from saved records. The dataset represents a fixed simulated session; turnover is gross trade value, not portfolio value or profit/loss.
 
-## Verification
+## Tests and verification
 
 ```sh
 npm run typecheck
@@ -130,31 +141,34 @@ npm run test:e2e
 npm audit
 ```
 
-Playwright starts the production server on port 3100 with a separate test database. Its suite tests browser interactions, light/dark mobile layouts, live delivery to multiple tabs, no status polling, API validation, and a real 35-second import under the 30-second request cutoff. Screenshots are written to `artifacts/`. The 15-minute maximum is checked arithmetically in the unit suite; see `docs/VERIFICATION.md` for the actual executed checks and limits.
+Playwright starts a production server on port 3100 with a separate test database. Tests cover API validation, import persistence and recovery, live delivery to multiple tabs, response ordering, dashboard interactions and mobile layouts.
 
-## Structure
+Recorded verification includes 12 unit/integration tests, 14 Chromium browser tests and a completed 15-minute mock import. See [verification results and limits](docs/VERIFICATION.md) and the [requirement checklist](docs/ASSIGNMENT_AUDIT.md).
+
+## Project structure
 
 ```text
-server.ts                       HTTP endpoints + WebSocket transport + startup
-src/server/mock.ts              Deterministic exchange simulator and validation
-src/server/store.ts             SQLite read model, staging, durable job state
-src/server/importer.ts          Resumable background data-page consumer
-src/shared/types.ts             Shared data contract
-src/components/Dashboard.tsx    Dashboard and interaction state
-src/components/ActivityChart.tsx SVG charts from stored records
-src/components/Dropdown.tsx      Keyboard-accessible custom selection popover
-src/components/ScrollRegion.tsx Hidden-scrollbar table with directional controls
-src/components/WorkspaceMenu.tsx Compact workspace actions
-src/components/LiquidGlassEffects.tsx React lifecycle for the vendored glass API
-public/vendor/                  Original liquid-glass source + MIT notice
-src/app/                       Next.js App Router and responsive theme CSS
-tests/                         Unit/integration and browser checks
-docs/ARCHITECTURE.md            Short design note and diagram
-docs/RESEARCH.md                Sourced research and engineering decisions
+server.ts              HTTP routes, WebSocket transport and startup
+src/server/mock.ts     Seeded exchange simulator and validation
+src/server/store.ts    SQLite storage, staging and durable job state
+src/server/importer.ts Background page consumer and recovery
+src/shared/types.ts    Shared data contracts
+src/app/               Next.js application entry points
+src/components/        Dashboard, charts and controls
+tests/                 Unit, integration and browser tests
+docs/                  Architecture, verification and demo video
 ```
 
-## Deployment boundary
+## Runtime scope
 
-Run **one always-on Node process on a host with a persistent local disk**. A single SQLite job slot and process-local WebSocket fan-out deliberately keep this assignment small. Do not run multiple application replicas against the same file or deploy this version as ephemeral serverless functions. Back up the database safely, including WAL considerations; stop the process before a simple file copy.
+Run one application process with a persistent local disk. This implementation is not intended for ephemeral serverless functions or multiple replicas sharing a SQLite file. Public deployment would require authentication, HTTPS, WebSocket proxy support and operational controls. Real BSE integration and production deployment are outside this assessment.
 
-The app binds to loopback by default and is an unauthenticated synthetic-data assessment. Public deployment would require authentication/authorization, HTTPS and WebSocket proxy configuration, rate limits, retention, monitoring, and backups. For larger datasets, move filtering/paging and aggregation to SQL instead of sending the full read model to every browser. For multiple replicas, use a dedicated worker, PostgreSQL and a shared event transport. These are intentionally outside this assignment.
+## Dashboard
+
+![Trades dashboard](docs/preview-light.png)
+
+## Credits
+
+Third-party component licences are preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Demo music: “Happy Beats / Business Moves Vol. 12” by Sascha Ende, [ende.app](https://ende.app/en), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Trimmed and faded beneath the narration.

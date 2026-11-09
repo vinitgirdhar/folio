@@ -110,7 +110,7 @@ export default function Dashboard() {
         }
       })
       .catch((e) => {
-        if (!stopped) setError(e.message);
+        if (!stopped && !received) setError(e.message);
       });
     function connect() {
       socket = new WebSocket(
@@ -311,7 +311,8 @@ export default function Dashboard() {
       setData((current) => ({
         ...current,
         pulls: [
-          result.pull,
+          current.pulls.find((pull) => pull.id === result.pull.id) ??
+            result.pull,
           ...current.pulls.filter((p) => p.id !== result.pull.id),
         ],
       }));

@@ -1,0 +1,167 @@
+{
+  "passed": true,
+  "jobId": "7c36db07-9bd1-4b44-bd0a-89d3e3999b5f",
+  "configuredDelayMs": 900000,
+  "elapsedMs": 900963,
+  "initialTotal": 5000,
+  "finalTotal": 10000,
+  "inserted": 5000,
+  "transport": "WebSocket; no status polling",
+  "observed": [
+    {
+      "at": "2026-11-09T11:11:58.096Z",
+      "page": 21,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:12:07.430Z",
+      "page": 22,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:12:25.443Z",
+      "page": 23,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:12:43.456Z",
+      "page": 24,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:13:01.493Z",
+      "page": 25,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:13:19.519Z",
+      "page": 26,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:13:37.529Z",
+      "page": 27,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:13:55.549Z",
+      "page": 28,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:14:13.565Z",
+      "page": 29,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:14:31.575Z",
+      "page": 30,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:14:49.594Z",
+      "page": 31,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:15:07.601Z",
+      "page": 32,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:15:25.614Z",
+      "page": 33,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:15:43.623Z",
+      "page": 34,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:16:01.635Z",
+      "page": 35,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:16:19.643Z",
+      "page": 36,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:16:37.657Z",
+      "page": 37,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:16:55.664Z",
+      "page": 38,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:17:13.682Z",
+      "page": 39,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:17:31.688Z",
+      "page": 40,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:17:49.701Z",
+      "page": 41,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:18:07.716Z",
+      "page": 42,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:18:25.755Z",
+      "page": 43,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:18:43.770Z",
+      "page": 44,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:19:01.777Z",
+      "page": 45,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:19:19.795Z",
+      "page": 46,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:19:37.801Z",
+      "page": 47,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:19:55.817Z",
+      "page": 48,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:20:13.829Z",
+      "page": 49,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:20:31.844Z",
+      "page": 50,
+      "status": "running"
+    },
+    {
+      "at": "2026-11-09T11:20:31.928Z",
+      "page": 50,
+      "status": "completed"
+    }
+  ]
+}

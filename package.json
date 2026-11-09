@@ -7,9 +7,9 @@
     "node": ">=22.13.0 <23 || >=24.0.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "tsx server.ts",
     "build": "next build",
-    "start": "next start",
+    "start": "tsx server.ts --production",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "tsx --test tests/*.test.ts"

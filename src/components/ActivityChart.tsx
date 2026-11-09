@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import type { Trade } from "../shared/types";
 
 export function ActivityChart({ trades }: { trades: Trade[] }) {
   const [hover, setHover] = useState<number | null>(null);
+  const line = useRef<SVGPathElement>(null);
   const values = Array.from({ length: 48 }, () => 0);
   for (const t of trades) {
     const d = new Date(t.timestamp);
@@ -21,6 +23,24 @@ export function ActivityChart({ trades }: { trades: Trade[] }) {
     (v, i) => `${18 + (i / 47) * 744},${190 - (v / max) * 155}`,
   );
   const path = `M ${points.join(" L ")}`;
+  useEffect(() => {
+    if (!line.current || matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return;
+    const length = line.current.getTotalLength();
+    const animation = gsap.fromTo(
+      line.current,
+      { strokeDasharray: length, strokeDashoffset: length },
+      {
+        strokeDashoffset: 0,
+        duration: 1.3,
+        ease: "power2.inOut",
+        clearProps: "strokeDasharray,strokeDashoffset",
+      },
+    );
+    return () => {
+      animation.revert();
+    };
+  }, [sum]);
   const selected = hover === null ? null : Math.min(47, Math.max(0, hover));
   return (
     <div className="activity-chart">
@@ -50,6 +70,7 @@ export function ActivityChart({ trades }: { trades: Trade[] }) {
         <path d={`${path} L 762,196 L 18,196 Z`} fill="url(#chart-fill)" />
         <path
           className="chart-line"
+          ref={line}
           d={path}
           fill="none"
           stroke="#5980f3"

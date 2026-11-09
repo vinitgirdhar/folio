@@ -4,6 +4,18 @@ A responsive, Apple-inspired BSE trading dashboard for the software engineer ass
 
 **All records and prices are synthetic. This app does not place orders or connect to the real BSE.**
 
+## Product walkthrough
+
+A 90-second walkthrough of the problem, live import flow, dashboard and API, with English narration. Play the video below and enable audio with the player's volume control.
+
+https://github.com/user-attachments/assets/0d169ed4-6eda-4d11-86f6-11360180a98b
+
+[Download the original MP4](docs/folio-launch.mp4)
+
+Music: “Happy Beats / Business Moves Vol. 12” by Sascha Ende, [ende.app](https://ende.app/en), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Trimmed and faded beneath the narration.
+
+## Dashboard preview
+
 ![Folio dashboard in light mode](docs/preview-light.png)
 
 <details>

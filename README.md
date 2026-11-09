@@ -17,6 +17,8 @@ The glass optics reuse [deepika-builds/liquid-glass](https://github.com/deepika-
 
 The floating toolbar's **Workspace options** menu holds import history, full CSV export and help. Import history is collapsed by default. Every dropdown is custom styled and supports arrows, Home/End, typeahead, Enter, Escape and outside dismissal. The time header sorts the table. Scrollbars are hidden while touch, trackpad and keyboard scrolling remain available; overflowing tables show edge fades, an animated discovery hint and functional left/right controls. Reduced-motion preferences disable the motion.
 
+During an import, a prominent activity card shows an animated ring, waveform and progress bar using the actual server percentage. **Pull in progress**, the toolbar indicator and **View progress** open a larger live view. The dashboard stays usable; disconnection pauses the activity animation and labels the last confirmed progress. Completion turns the card green with the number of added trades and a dismiss control.
+
 The [assignment compliance audit](docs/ASSIGNMENT_AUDIT.md) maps every required item to its implementation and evidence. A [Trading Session Replay proposal](docs/NEXT_FEATURE.md) is kept separate; no extra product feature is implemented in this baseline.
 
 ## Run locally

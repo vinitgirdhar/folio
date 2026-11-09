@@ -80,7 +80,7 @@ test("a 35-second import survives the HTTP limit and updates two open dashboards
     );
   await page.getByRole("button", { name: "Start pull", exact: true }).click();
   await expect(
-    page.getByText("Pull started. You can keep working.", { exact: true }),
+    page.getByRole("heading", { name: "Importing your trades", exact: true }),
   ).toBeVisible();
   await expect(page.getByTestId("trade-count")).toHaveText(
     before.toLocaleString("en-IN"),

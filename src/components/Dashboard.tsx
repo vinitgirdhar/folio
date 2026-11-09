@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Database,
+  LoaderCircle,
   Moon,
   Plus,
   Radio,
@@ -28,6 +29,7 @@ import { Dropdown } from "./Dropdown";
 import { WorkspaceMenu } from "./WorkspaceMenu";
 import { ScrollRegion } from "./ScrollRegion";
 import { LiquidGlassEffects } from "./LiquidGlassEffects";
+import { ImportProgress } from "./ImportProgress";
 
 const rupee = (value: number, decimals = 2) =>
   new Intl.NumberFormat("en-IN", {
@@ -82,14 +84,16 @@ export default function Dashboard() {
   const [symbol, setSymbol] = useState("All symbols");
   const [page, setPage] = useState(0);
   const [range, setRange] = useState("Full session");
-  const [modal, setModal] = useState<"pull" | "help" | null>(null);
+  const [modal, setModal] = useState<"pull" | "progress" | "help" | null>(null);
   const [delay, setDelay] = useState("12000");
   const [submitting, setSubmitting] = useState(false);
-  const [notice, setNotice] = useState("");
+  const [progressPullId, setProgressPullId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const importDetails = useRef<HTMLDetailsElement>(null);
   const active = data.pulls.find((p) => p.status === "running");
+  const progressPull =
+    active ?? data.pulls.find((pull) => pull.id === progressPullId);
 
   useEffect(() => {
     let socket: WebSocket;
@@ -98,6 +102,10 @@ export default function Dashboard() {
     let attempts = 0;
     let received = false;
     const abort = new AbortController();
+    function rememberPull(pulls: Pull[]) {
+      const running = pulls.find((pull) => pull.status === "running");
+      if (running) setProgressPullId(running.id);
+    }
     fetch("/api/trades", { signal: abort.signal })
       .then((r) => {
         if (!r.ok) throw new Error("Could not read saved trades.");
@@ -106,6 +114,7 @@ export default function Dashboard() {
       .then((snapshot) => {
         if (!received && !stopped) {
           setData(snapshot);
+          rememberPull(snapshot.pulls);
           setLoaded(true);
         }
       })
@@ -126,11 +135,14 @@ export default function Dashboard() {
           if (message.type === "snapshot") {
             received = true;
             setData(message.data);
+            rememberPull(message.data.pulls);
             setLoaded(true);
             setError("");
           }
-          if (message.type === "pulls")
+          if (message.type === "pulls") {
             setData((current) => ({ ...current, pulls: message.data }));
+            rememberPull(message.data);
+          }
         } catch {
           setError(
             "An update could not be read. Reconnect to restore your view.",
@@ -316,12 +328,8 @@ export default function Dashboard() {
           ...current.pulls.filter((p) => p.id !== result.pull.id),
         ],
       }));
+      setProgressPullId(result.pull.id);
       setModal(null);
-      setNotice(
-        result.reused
-          ? "The current pull is already running."
-          : "Pull started. You can keep working.",
-      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not start the pull.");
     } finally {
@@ -343,6 +351,19 @@ export default function Dashboard() {
           </Link>
           <span className="desk-title">Trade desk</span>
           <div className="top-actions">
+            {active && (
+              <button
+                className="toolbar-import"
+                aria-label="View import progress"
+                onClick={() => setModal("progress")}
+                data-connected={connected}
+              >
+                <LoaderCircle size={15} />
+                <span>
+                  {Math.round((active.nextPage / active.totalPages) * 100)}%
+                </span>
+              </button>
+            )}
             <span className="mock-badge">
               <span />
               BSE sandbox
@@ -374,12 +395,20 @@ export default function Dashboard() {
               <p>Your activity, your numbers. All in one place.</p>
             </div>
             <button
-              className="primary-button"
-              onClick={() => setModal("pull")}
-              disabled={!!active || !loaded}
+              className={`primary-button ${active ? "pull-active-button" : ""}`}
+              data-connected={connected}
+              aria-haspopup="dialog"
+              onClick={() => setModal(active ? "progress" : "pull")}
+              disabled={!loaded}
             >
-              <Plus size={17} />
-              {active ? "Pull in progress" : "Pull trades"}
+              {active ? (
+                <LoaderCircle size={17} className="pull-spinner" />
+              ) : (
+                <Plus size={17} />
+              )}
+              {active
+                ? `Pull in progress · ${Math.round((active.nextPage / active.totalPages) * 100)}%`
+                : "Pull trades"}
             </button>
           </div>
           {error && (
@@ -390,17 +419,14 @@ export default function Dashboard() {
               </button>
             </div>
           )}
-          {notice && (
-            <div className="notice" role="status">
-              <Check size={16} />
-              {notice}
-              <button
-                onClick={() => setNotice("")}
-                aria-label="Dismiss notification"
-              >
-                <X size={16} />
-              </button>
-            </div>
+          {progressPull && (
+            <ImportProgress
+              key={progressPull.id}
+              pull={progressPull}
+              connected={connected}
+              onOpen={() => setModal("progress")}
+              onDismiss={() => setProgressPullId(null)}
+            />
           )}
           <div className="connection-strip reveal">
             <div>
@@ -885,7 +911,13 @@ export default function Dashboard() {
       {modal && (
         <dialog
           ref={dialog}
-          aria-label={modal === "pull" ? "Import trades" : "How Folio works"}
+          aria-label={
+            modal === "pull"
+              ? "Import trades"
+              : modal === "progress"
+                ? "Import progress"
+                : "How Folio works"
+          }
           className="modal"
           data-liquid-glass
           onCancel={() => setModal(null)}
@@ -895,7 +927,7 @@ export default function Dashboard() {
         >
           <div className="modal-heading">
             <span className="modal-icon">
-              {modal === "pull" ? (
+              {modal !== "help" ? (
                 <Database size={22} />
               ) : (
                 <CircleHelp size={22} />
@@ -909,7 +941,19 @@ export default function Dashboard() {
               <X size={20} />
             </button>
           </div>
-          {modal === "pull" ? (
+          {modal === "progress" ? (
+            <>
+              {progressPull && (
+                <ImportProgress pull={progressPull} connected={connected} />
+              )}
+              <button
+                className="secondary-button full-width"
+                onClick={() => setModal(null)}
+              >
+                Keep exploring
+              </button>
+            </>
+          ) : modal === "pull" ? (
             <>
               <h2>Bring your trades into focus.</h2>
               <p>

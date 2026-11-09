@@ -8,7 +8,7 @@ Environment: Windows, Node 22.23.4, npm 10.9.9. Date: 9 November 2026.
 | ESLint (`npm run lint`) | Passed, no warnings |
 | Optimized Next.js production build | Passed |
 | Unit/integration suite (`npm test`) | 12 passed |
-| Chromium browser suite (`npm run test:e2e`) | 12 passed |
+| Chromium browser suite (`npm run test:e2e`) | 14 passed |
 | Coverage of `src/server/{importer,mock,store}.ts` | 99.65% lines, 92.75% branches, 100% functions |
 | Production dependency audit (`npm audit --omit=dev`) | Zero vulnerabilities |
 | Full dependency audit | Eight moderate findings in the development ESLint/TypeScript ESLint dependency chain, rooted in a minimatch advisory. No high/critical findings. |
@@ -40,6 +40,13 @@ Environment: Windows, Node 22.23.4, npm 10.9.9. Date: 9 November 2026.
 - The time header sorts trades in both directions. Symbol-card arrows filter the table, and pagination arrows move and return to the same records.
 - Hidden scrollbars preserve native horizontal keyboard scrolling and directional buttons. The discovery cue appears when needed; buttons disable at the real scroll boundaries.
 - Additional Axe scans with an open custom dropdown pass in light/dark themes at desktop and mobile widths. The refraction remains decorative, with semantic labels and controls independent of its rendering.
+
+## Visible import activity
+
+- A real 12-second import verifies the animated activity card, enabled **Pull in progress** button, toolbar shortcut, larger progress dialog, continued search, actual percentage updates and dismissible completion with exactly 5,000 added records.
+- Closing the WebSocket pauses the busy animation, shows **Reconnecting**, and resumes live progress after transport recovery.
+- Mobile checks at widths 320 and 390 pixels find no document overflow. Reduced-motion mode disables the orbit animation; Axe WCAG 2 A/AA and 2.1 AA scans of the mobile card and progress dialog report zero violations.
+- Percentages come from acknowledged server pages. The moving activity indicators do not estimate progress or remaining time. The backend and its previously recorded 15-minute verification are unchanged.
 
 ## Deliberate verification limits
 

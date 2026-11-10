@@ -34,6 +34,10 @@ Select a trade ID to inspect its execution time, quantity, price and gross value
 
 Open **More filters** in the blotter to filter by client, minimum/maximum trade value in INR and an inclusive IST time range. Save up to ten named views, including search, symbol and side filters; apply or delete them later. Views stay in this browser and can be reused after reload. Invalid ranges show a validation message. CSV exports use the complete filtered result, not only the visible page.
 
+### Session insights
+
+Expand **Session insights** to see symbol turnover concentration, quantity-weighted executed prices, the five most active clients by gross turnover, and buy/sell totals. These figures use the same saved-session or replay scope as the dashboard. They describe executed trades, not holdings, investment signals or profit/loss. Concentration bars animate on expansion and respect reduced-motion preferences.
+
 ## Demo video
 
 A 90-second walkthrough of the problem, dashboard, import flow and APIs. Use the player's volume control to enable narration.

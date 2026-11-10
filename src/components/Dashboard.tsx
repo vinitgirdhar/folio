@@ -33,6 +33,7 @@ import { ImportProgress } from "./ImportProgress";
 import { SessionReplay, useSessionReplay } from "./SessionReplay";
 import { TradeDetails } from "./TradeDetails";
 import { TradeFilters } from "./TradeFilters";
+import { SessionInsights } from "./SessionInsights";
 import {
   EMPTY_TRADE_FILTERS,
   matchesTradeFilters,
@@ -891,6 +892,7 @@ export default function Dashboard() {
               </div>
             </div>
           </section>
+          <SessionInsights trades={sessionTrades} />
           <details
             className="panel import-panel reveal"
             id="imports"

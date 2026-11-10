@@ -32,6 +32,11 @@ import { LiquidGlassEffects } from "./LiquidGlassEffects";
 import { ImportProgress } from "./ImportProgress";
 import { SessionReplay, useSessionReplay } from "./SessionReplay";
 import { TradeDetails } from "./TradeDetails";
+import { TradeFilters } from "./TradeFilters";
+import {
+  EMPTY_TRADE_FILTERS,
+  matchesTradeFilters,
+} from "../shared/trade-filters";
 
 const rupee = (value: number, decimals = 2) =>
   new Intl.NumberFormat("en-IN", {
@@ -82,6 +87,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [sortAscending, setSortAscending] = useState(false);
   const [query, setQuery] = useState("");
+  const [extraFilters, setExtraFilters] = useState(EMPTY_TRADE_FILTERS);
   const [side, setSide] = useState("All sides");
   const [symbol, setSymbol] = useState("All symbols");
   const [page, setPage] = useState(0);
@@ -259,11 +265,12 @@ export default function Dashboard() {
         (t) =>
           (side === "All sides" || t.side === side) &&
           (symbol === "All symbols" || t.symbol === symbol) &&
+          matchesTradeFilters(t, extraFilters) &&
           `${t.id} ${t.client} ${t.symbol}`
             .toLowerCase()
             .includes(query.toLowerCase()),
       ),
-    [sessionTrades, side, symbol, query, sortAscending],
+    [sessionTrades, side, symbol, query, sortAscending, extraFilters],
   );
   const pageCount = Math.max(1, Math.ceil(filtered.length / 8));
   const safePage = Math.min(page, pageCount - 1);
@@ -728,6 +735,22 @@ export default function Dashboard() {
                 />
               </div>
             </div>
+            <TradeFilters
+              trades={sessionTrades}
+              value={{ ...extraFilters, query, symbol, side }}
+              onChange={({
+                query: nextQuery,
+                symbol: nextSymbol,
+                side: nextSide,
+                ...extras
+              }) => {
+                setQuery(nextQuery);
+                setSymbol(nextSymbol);
+                setSide(nextSide);
+                setExtraFilters(extras);
+                setPage(0);
+              }}
+            />
             <ScrollRegion>
               <table>
                 <thead>
@@ -829,6 +852,7 @@ export default function Dashboard() {
                         setQuery("");
                         setSide("All sides");
                         setSymbol("All symbols");
+                        setExtraFilters(EMPTY_TRADE_FILTERS);
                       }}
                     >
                       Clear filters
@@ -979,6 +1003,7 @@ export default function Dashboard() {
               onClient={(client) => {
                 setModal(null);
                 setQuery(client);
+                setExtraFilters(EMPTY_TRADE_FILTERS);
                 setSymbol("All symbols");
                 setSide("All sides");
                 setPage(0);

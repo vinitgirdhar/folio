@@ -30,6 +30,10 @@ Select **Start replay** to review a fixed snapshot of saved trades. Play/pause, 
 
 Select a trade ID to inspect its execution time, quantity, price and gross value. The detail dialog includes client activity and the symbol's quantity-weighted executed price within the current review scope. **View client trades** focuses the blotter on that client. Opening a trade pauses replay for a stable review.
 
+### Advanced filters and saved views
+
+Open **More filters** in the blotter to filter by client, minimum/maximum trade value in INR and an inclusive IST time range. Save up to ten named views, including search, symbol and side filters; apply or delete them later. Views stay in this browser and can be reused after reload. Invalid ranges show a validation message. CSV exports use the complete filtered result, not only the visible page.
+
 ## Demo video
 
 A 90-second walkthrough of the problem, dashboard, import flow and APIs. Use the player's volume control to enable narration.

@@ -1,0 +1,128 @@
+.trade-filters {
+  border-top: 1px solid var(--line);
+}
+.trade-filters summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+  list-style: none;
+}
+.trade-filters summary::-webkit-details-marker {
+  display: none;
+}
+.trade-filters summary:hover {
+  color: var(--text);
+}
+.trade-filter-count {
+  padding: 3px 7px;
+  border-radius: 6px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  font-size: 10px;
+}
+.trade-filter-content {
+  padding: 5px 22px 18px;
+}
+.trade-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.trade-filter-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.trade-filter-field input {
+  width: 100%;
+  height: 37px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+}
+.trade-filter-field .dropdown-trigger {
+  width: 100%;
+  height: 37px;
+}
+.trade-filter-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 0;
+  background: transparent;
+  color: var(--blue);
+  font-size: 11px;
+}
+.trade-view-controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+.trade-view-controls > .trade-filter-field {
+  flex: 1 1 175px;
+}
+.trade-view-controls .icon-button {
+  margin-bottom: 1px;
+}
+.trade-view-controls .secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 37px;
+  font-size: 11px;
+}
+.trade-filter-note,
+.trade-filter-feedback {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.trade-filter-error {
+  margin: 0;
+  padding: 0 22px 14px;
+  color: var(--red);
+  font-size: 11px;
+  line-height: 1.6;
+}
+@media (max-width: 600px) {
+  .trade-filters summary {
+    padding: 13px 16px;
+  }
+  .trade-filter-content {
+    padding: 4px 16px 16px;
+  }
+  .trade-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .trade-filter-error {
+    padding: 0 16px 14px;
+  }
+  .trade-view-controls > .trade-filter-field {
+    flex-basis: calc(100% - 50px);
+  }
+  .trade-view-controls .trade-view-name {
+    flex-basis: 100%;
+  }
+  .trade-view-controls .secondary-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

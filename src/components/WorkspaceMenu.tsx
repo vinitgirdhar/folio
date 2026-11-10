@@ -13,10 +13,14 @@ export function WorkspaceMenu({
   onImports,
   onHelp,
   onExport,
+  onInsights,
+  onAudit,
 }: {
   onImports: () => void;
   onHelp: () => void;
   onExport: () => void;
+  onInsights: () => void;
+  onAudit: () => void;
 }) {
   const menu = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
@@ -75,6 +79,14 @@ export function WorkspaceMenu({
         <button onClick={() => run(onExport)}>
           <ArrowDownToLine size={16} />
           Export all trades
+        </button>
+        <button onClick={() => run(onInsights)}>
+          <Clock3 size={16} />
+          Session insights
+        </button>
+        <button onClick={() => run(onAudit)}>
+          <Clock3 size={16} />
+          Import verification
         </button>
         <span className="menu-separator" />
         <button onClick={() => run(onHelp)}>

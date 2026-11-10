@@ -38,6 +38,10 @@ Open **More filters** in the blotter to filter by client, minimum/maximum trade 
 
 Expand **Session insights** to see symbol turnover concentration, quantity-weighted executed prices, the five most active clients by gross turnover, and buy/sell totals. These figures use the same saved-session or replay scope as the dashboard. They describe executed trades, not holdings, investment signals or profit/loss. Concentration bars animate on expansion and respect reduced-motion preferences.
 
+### Import verification and batch export
+
+Expand **Import verification** to select a completed import, reconcile its inserted count against saved records, check duplicate IDs and compare turnover/quantity with the previous completed batch. **Export batch CSV** downloads only that batch. Verification always uses the full saved dataset, even during replay. Batch membership follows the mock API's deterministic trade-ID prefix; it is a record-count check, not exchange certification. Session insights and import verification are also available from **Workspace options**.
+
 ## Demo video
 
 A 90-second walkthrough of the problem, dashboard, import flow and APIs. Use the player's volume control to enable narration.
@@ -161,7 +165,7 @@ npm audit
 
 Playwright starts a production server on port 3100 with a separate test database. Tests cover API validation, import persistence and recovery, live delivery to multiple tabs, response ordering, dashboard interactions and mobile layouts.
 
-Recorded verification includes 12 unit/integration tests, 14 Chromium browser tests and a completed 15-minute mock import. See [verification results and limits](docs/VERIFICATION.md) and the [requirement checklist](docs/ASSIGNMENT_AUDIT.md).
+Recorded verification includes 26 unit/integration tests, 19 Chromium browser tests and a completed 15-minute mock import. See [verification results and limits](docs/VERIFICATION.md) and the [requirement checklist](docs/ASSIGNMENT_AUDIT.md).
 
 ## Project structure
 

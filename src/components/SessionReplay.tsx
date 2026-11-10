@@ -126,11 +126,27 @@ export function SessionReplay({
             </span>
             <input
               aria-label="Replay time"
+              aria-valuetext={`${stamp(replay.at)} IST`}
               type="range"
               min={replay.bounds.start}
               max={replay.bounds.end}
               value={replay.at}
               onChange={(event) => replay.seek(Number(event.target.value))}
+              onKeyDown={(event) => {
+                if (
+                  ["ArrowLeft", "ArrowDown", "ArrowRight", "ArrowUp"].includes(
+                    event.key,
+                  )
+                ) {
+                  event.preventDefault();
+                  replay.seek(
+                    replay.at +
+                      (["ArrowLeft", "ArrowDown"].includes(event.key)
+                        ? -60000
+                        : 60000),
+                  );
+                }
+              }}
             />
           </label>
           <Dropdown

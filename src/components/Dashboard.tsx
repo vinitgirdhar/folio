@@ -34,6 +34,7 @@ import { SessionReplay, useSessionReplay } from "./SessionReplay";
 import { TradeDetails } from "./TradeDetails";
 import { TradeFilters } from "./TradeFilters";
 import { SessionInsights } from "./SessionInsights";
+import { ImportAudit } from "./ImportAudit";
 import {
   EMPTY_TRADE_FILTERS,
   matchesTradeFilters,
@@ -286,6 +287,8 @@ export default function Dashboard() {
       : sessionTrades;
 
   function scrollToSection(id: string) {
+    const section = document.getElementById(id);
+    if (section instanceof HTMLDetailsElement) section.open = true;
     if (id === "imports" && importDetails.current)
       importDetails.current.open = true;
     requestAnimationFrame(() => {
@@ -298,10 +301,8 @@ export default function Dashboard() {
         root.current
           ?.querySelector<HTMLInputElement>('[aria-label="Search trades"]')
           ?.focus({ preventScroll: true });
-      if (id === "imports")
-        importDetails.current
-          ?.querySelector("summary")
-          ?.focus({ preventScroll: true });
+      if (section instanceof HTMLDetailsElement)
+        section.querySelector("summary")?.focus({ preventScroll: true });
     });
   }
   function toggleTheme() {
@@ -394,6 +395,8 @@ export default function Dashboard() {
             </button>
             <WorkspaceMenu
               onImports={() => scrollToSection("imports")}
+              onInsights={() => scrollToSection("insights")}
+              onAudit={() => scrollToSection("import-audit")}
               onHelp={() => setModal("help")}
               onExport={() => downloadCsv(data.trades)}
             />
@@ -951,6 +954,11 @@ export default function Dashboard() {
               )}
             </div>
           </details>
+          <ImportAudit
+            trades={data.trades}
+            pulls={data.pulls}
+            onExport={downloadCsv}
+          />
           <footer className="footer">
             <span>
               <span className="mini-brand">f.</span> Less noise. More

@@ -1,14 +1,14 @@
 # Verification record
 
-Environment: Windows, Node 22.23.4, npm 10.9.9. Date: 9 November 2026.
+Environment: Windows, Node 22.23.4, npm 10.9.9. Original assessment: 9 November 2026. Review-tool verification: 10 November 2026.
 
 | Check | Result |
 | --- | --- |
 | TypeScript (`npm run typecheck`) | Passed |
 | ESLint (`npm run lint`) | Passed, no warnings |
 | Optimized Next.js production build | Passed |
-| Unit/integration suite (`npm test`) | 12 passed |
-| Chromium browser suite (`npm run test:e2e`) | 14 passed |
+| Unit/integration suite (`npm test`) | 26 passed |
+| Chromium browser suite (`npm run test:e2e`) | 19 passed |
 | Coverage of `src/server/{importer,mock,store}.ts` | 99.65% lines, 92.75% branches, 100% functions |
 | Production dependency audit (`npm audit --omit=dev`) | Zero vulnerabilities |
 | Full dependency audit | Eight moderate findings in the development ESLint/TypeScript ESLint dependency chain, rooted in a minimatch advisory. No high/critical findings. |
@@ -47,6 +47,16 @@ Environment: Windows, Node 22.23.4, npm 10.9.9. Date: 9 November 2026.
 - Closing the WebSocket pauses the busy animation, shows **Reconnecting**, and resumes live progress after transport recovery.
 - Mobile checks at widths 320 and 390 pixels find no document overflow. Reduced-motion mode disables the orbit animation; Axe WCAG 2 A/AA and 2.1 AA scans of the mobile card and progress dialog report zero violations.
 - Percentages come from acknowledged server pages. The moving activity indicators do not estimate progress or remaining time. The backend and its previously recorded 15-minute verification are unchanged.
+
+## Review tools — 10 November 2026
+
+- Session replay: inclusive seeking, one-minute keyboard navigation, play/pause, speed, restart and return to the saved dataset pass. An import completed during replay without changing its pinned snapshot; exit restored the additional 5,000 records. The local playback clock makes no network requests.
+- Trade inspection: exact notional and client navigation pass; opening an execution pauses replay. Symbol price context uses quantity-weighted executed prices, not a simple average.
+- Advanced filters: client, exact paise bounds and IST minute ranges are tested. Invalid ranges show errors; saved views restore search, symbol, side and advanced criteria after reload, and can be deleted.
+- Session analytics: buy/sell turnover is independently checked against the API dataset; concentration and top-client figures use the current replay/saved scope.
+- Import verification: batch-only CSV contains exactly 5,000 unique records from the selected completed mock batch. Duplicate and count mismatch fixtures cannot report reconciliation. This relies on mock batch-prefixed IDs and is not exchange certification.
+- All review panels and the detail dialog pass light/dark Axe WCAG 2 A/AA and 2.1 AA scans at 320/390 pixels, with no document overflow. Desktop, mobile and inspector screenshots were reviewed. Mobile turnover totals use stacked rows to keep full currency values readable.
+- TypeScript, ESLint, production build and code review pass. The original import/reconnection browser checks remain green. The previously recorded full 15-minute run was not repeated for these frontend additions.
 
 ## Deliberate verification limits
 

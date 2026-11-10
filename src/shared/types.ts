@@ -9,6 +9,7 @@ export type Trade = {
 };
 export type Pull = {
   id: string;
+  batch: number;
   status: "running" | "completed" | "failed";
   delayMs: number;
   nextPage: number;

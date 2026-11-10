@@ -179,7 +179,8 @@
     gap: 28px;
   }
   .insights-flow {
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
   }
   .insights-flow span,
   .insights-flow small {

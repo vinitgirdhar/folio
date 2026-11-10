@@ -30,6 +30,7 @@ import { WorkspaceMenu } from "./WorkspaceMenu";
 import { ScrollRegion } from "./ScrollRegion";
 import { LiquidGlassEffects } from "./LiquidGlassEffects";
 import { ImportProgress } from "./ImportProgress";
+import { SessionReplay, useSessionReplay } from "./SessionReplay";
 
 const rupee = (value: number, decimals = 2) =>
   new Intl.NumberFormat("en-IN", {
@@ -94,6 +95,8 @@ export default function Dashboard() {
   const active = data.pulls.find((p) => p.status === "running");
   const progressPull =
     active ?? data.pulls.find((pull) => pull.id === progressPullId);
+  const replay = useSessionReplay(data.trades);
+  const sessionTrades = replay.trades;
 
   useEffect(() => {
     let socket: WebSocket;
@@ -211,23 +214,23 @@ export default function Dashboard() {
   }, [modal]);
 
   const metrics = useMemo(() => {
-    const buys = data.trades.filter((t) => t.side === "BUY");
+    const buys = sessionTrades.filter((t) => t.side === "BUY");
     return {
-      value: data.trades.reduce(
+      value: sessionTrades.reduce(
         (sum, t) => sum + (t.quantity * t.pricePaise) / 100,
         0,
       ),
-      buyShare: data.trades.length
-        ? (buys.length / data.trades.length) * 100
+      buyShare: sessionTrades.length
+        ? (buys.length / sessionTrades.length) * 100
         : 0,
-      clients: new Set(data.trades.map((t) => t.client)).size,
-      units: data.trades.reduce((sum, t) => sum + t.quantity, 0),
+      clients: new Set(sessionTrades.map((t) => t.client)).size,
+      units: sessionTrades.reduce((sum, t) => sum + t.quantity, 0),
     };
-  }, [data.trades]);
+  }, [sessionTrades]);
   const assets = useMemo(
     () =>
       SYMBOLS.map((asset) => {
-        const trades = data.trades.filter((t) => t.symbol === asset.symbol);
+        const trades = sessionTrades.filter((t) => t.symbol === asset.symbol);
         const first = trades.at(-1)?.pricePaise ?? asset.price;
         const last = trades[0]?.pricePaise ?? asset.price;
         const samples = [...trades]
@@ -238,16 +241,17 @@ export default function Dashboard() {
           .map((t) => t.pricePaise);
         return {
           ...asset,
+          hasTrades: trades.length > 0,
           last,
           change: ((last - first) / first) * 100,
           samples,
         };
       }),
-    [data.trades],
+    [sessionTrades],
   );
   const filtered = useMemo(
     () =>
-      (sortAscending ? [...data.trades].reverse() : data.trades).filter(
+      (sortAscending ? [...sessionTrades].reverse() : sessionTrades).filter(
         (t) =>
           (side === "All sides" || t.side === side) &&
           (symbol === "All symbols" || t.symbol === symbol) &&
@@ -255,19 +259,19 @@ export default function Dashboard() {
             .toLowerCase()
             .includes(query.toLowerCase()),
       ),
-    [data.trades, side, symbol, query, sortAscending],
+    [sessionTrades, side, symbol, query, sortAscending],
   );
   const pageCount = Math.max(1, Math.ceil(filtered.length / 8));
   const safePage = Math.min(page, pageCount - 1);
   const visible = filtered.slice(safePage * 8, safePage * 8 + 8);
   const chartTrades =
     range === "Last hour"
-      ? data.trades.filter(
+      ? sessionTrades.filter(
           (t) =>
             new Date(t.timestamp).getTime() >=
-            new Date(data.trades[0]?.timestamp ?? 0).getTime() - 3600000,
+            new Date(sessionTrades[0]?.timestamp ?? 0).getTime() - 3600000,
         )
-      : data.trades;
+      : sessionTrades;
 
   function scrollToSection(id: string) {
     if (id === "imports" && importDetails.current)
@@ -448,6 +452,10 @@ export default function Dashboard() {
               Automatic updates
             </span>
           </div>
+          <SessionReplay
+            replay={replay}
+            disabled={!loaded || !data.trades.length}
+          />
           <section className="metrics reveal" aria-label="Trading summary">
             <div className="metric" data-liquid-glass>
               <span>Total traded value</span>
@@ -457,7 +465,9 @@ export default function Dashboard() {
               </strong>
               <p>
                 <span className="metric-indicator blue" />
-                Gross value across all saved trades
+                {replay.enabled
+                  ? "Gross value through the playhead"
+                  : "Gross value across all saved trades"}
               </p>
             </div>
             <div className="metric" data-liquid-glass>
@@ -465,7 +475,7 @@ export default function Dashboard() {
                 Trades executed <Table2 size={15} />
               </span>
               <strong data-testid="trade-count">
-                {loaded ? data.total.toLocaleString("en-IN") : "—"}
+                {loaded ? sessionTrades.length.toLocaleString("en-IN") : "—"}
               </strong>
               <p>
                 <span className="metric-indicator purple" />
@@ -527,7 +537,7 @@ export default function Dashboard() {
                 </strong>
                 <span>Gross turnover</span>
               </div>
-              <ActivityChart trades={chartTrades} />
+              <ActivityChart trades={chartTrades} animate={!replay.enabled} />
               <div className="chart-footer">
                 <span>
                   <i />
@@ -556,7 +566,9 @@ export default function Dashboard() {
               >
                 <div>
                   <small>Total trades</small>
-                  <strong>{data.total.toLocaleString("en-IN")}</strong>
+                  <strong>
+                    {sessionTrades.length.toLocaleString("en-IN")}
+                  </strong>
                   <span>Buy / sell split</span>
                 </div>
               </div>
@@ -624,10 +636,9 @@ export default function Dashboard() {
                   </div>
                   <div className="symbol-bottom">
                     <div>
-                      <strong>{rupee(a.last / 100)}</strong>
+                      <strong>{a.hasTrades ? rupee(a.last / 100) : "—"}</strong>
                       <span className={a.change >= 0 ? "positive" : "negative"}>
-                        {a.change >= 0 ? "+" : ""}
-                        {a.change.toFixed(2)}%
+                        {a.hasTrades ? `${a.change >= 0 ? "+" : ""}${a.change.toFixed(2)}%` : "No trades"}
                       </span>
                     </div>
                     <Sparkline values={a.samples} positive={a.change >= 0} />

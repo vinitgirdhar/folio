@@ -20,6 +20,12 @@ A full trade pull can take up to 15 minutes, while the network terminates HTTP c
 
 The dashboard also provides search, symbol/side filters, sorting, pagination, CSV export, import history and visible progress.
 
+## Review tools
+
+### Session replay
+
+Select **Start replay** to review a fixed snapshot of saved trades. Play/pause, change speed or scrub to an IST timestamp; totals, charts, symbol cards and the blotter follow the same playhead. New imports continue in the background and are included when you return to all trades. Blotter CSV exports respect the replay scope.
+
 ## Demo video
 
 A 90-second walkthrough of the problem, dashboard, import flow and APIs. Use the player's volume control to enable narration.

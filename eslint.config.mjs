@@ -9,5 +9,6 @@ export default defineConfig([
     "artifacts/**",
     "test-results/**",
     "public/vendor/**",
+    "brag-output*/**",
   ]),
 ]);

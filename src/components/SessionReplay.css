@@ -1,0 +1,89 @@
+.session-replay {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 22px;
+  margin: 0 0 24px;
+  background: var(--surface);
+}
+.session-replay.replaying {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+.replay-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.replay-heading strong {
+  font-size: 14px;
+}
+.replay-heading p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 6px 0 0;
+  max-width: 65ch;
+}
+.replay-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.replay-seek {
+  flex: 1;
+  min-width: 100px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.replay-seek > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.replay-seek input {
+  width: 100%;
+  margin: 12px 0 0;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+.replay-seek output {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.replay-count {
+  font-size: 11px;
+  min-width: 80px;
+  font-variant-numeric: tabular-nums;
+}
+.replay-count small {
+  display: block;
+  max-width: 170px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.replay-controls button {
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .session-replay {
+    padding: 16px;
+  }
+  .replay-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .replay-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .replay-seek {
+    flex-basis: calc(100% - 90px);
+  }
+  .replay-count {
+    margin-left: auto;
+  }
+}

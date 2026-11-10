@@ -3,7 +3,13 @@ import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import type { Trade } from "../shared/types";
 
-export function ActivityChart({ trades }: { trades: Trade[] }) {
+export function ActivityChart({
+  trades,
+  animate = true,
+}: {
+  trades: Trade[];
+  animate?: boolean;
+}) {
   const [hover, setHover] = useState<number | null>(null);
   const line = useRef<SVGPathElement>(null);
   const values = Array.from({ length: 48 }, () => 0);
@@ -24,7 +30,11 @@ export function ActivityChart({ trades }: { trades: Trade[] }) {
   );
   const path = `M ${points.join(" L ")}`;
   useEffect(() => {
-    if (!line.current || matchMedia("(prefers-reduced-motion: reduce)").matches)
+    if (
+      !animate ||
+      !line.current ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
       return;
     const length = line.current.getTotalLength();
     const animation = gsap.fromTo(
@@ -40,7 +50,7 @@ export function ActivityChart({ trades }: { trades: Trade[] }) {
     return () => {
       animation.revert();
     };
-  }, [sum]);
+  }, [sum, animate]);
   const selected = hover === null ? null : Math.min(47, Math.max(0, hover));
   return (
     <div className="activity-chart">

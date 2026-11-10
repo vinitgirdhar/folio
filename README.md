@@ -26,6 +26,10 @@ The dashboard also provides search, symbol/side filters, sorting, pagination, CS
 
 Select **Start replay** to review a fixed snapshot of saved trades. Play/pause, change speed or scrub to an IST timestamp; totals, charts, symbol cards and the blotter follow the same playhead. New imports continue in the background and are included when you return to all trades. Blotter CSV exports respect the replay scope.
 
+### Trade inspection
+
+Select a trade ID to inspect its execution time, quantity, price and gross value. The detail dialog includes client activity and the symbol's quantity-weighted executed price within the current review scope. **View client trades** focuses the blotter on that client. Opening a trade pauses replay for a stable review.
+
 ## Demo video
 
 A 90-second walkthrough of the problem, dashboard, import flow and APIs. Use the player's volume control to enable narration.

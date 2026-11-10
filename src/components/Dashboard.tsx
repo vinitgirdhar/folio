@@ -31,6 +31,7 @@ import { ScrollRegion } from "./ScrollRegion";
 import { LiquidGlassEffects } from "./LiquidGlassEffects";
 import { ImportProgress } from "./ImportProgress";
 import { SessionReplay, useSessionReplay } from "./SessionReplay";
+import { TradeDetails } from "./TradeDetails";
 
 const rupee = (value: number, decimals = 2) =>
   new Intl.NumberFormat("en-IN", {
@@ -85,7 +86,10 @@ export default function Dashboard() {
   const [symbol, setSymbol] = useState("All symbols");
   const [page, setPage] = useState(0);
   const [range, setRange] = useState("Full session");
-  const [modal, setModal] = useState<"pull" | "progress" | "help" | null>(null);
+  const [modal, setModal] = useState<
+    "pull" | "progress" | "help" | "trade" | null
+  >(null);
+  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [delay, setDelay] = useState("12000");
   const [submitting, setSubmitting] = useState(false);
   const [progressPullId, setProgressPullId] = useState<string | null>(null);
@@ -638,7 +642,9 @@ export default function Dashboard() {
                     <div>
                       <strong>{a.hasTrades ? rupee(a.last / 100) : "—"}</strong>
                       <span className={a.change >= 0 ? "positive" : "negative"}>
-                        {a.hasTrades ? `${a.change >= 0 ? "+" : ""}${a.change.toFixed(2)}%` : "No trades"}
+                        {a.hasTrades
+                          ? `${a.change >= 0 ? "+" : ""}${a.change.toFixed(2)}%`
+                          : "No trades"}
                       </span>
                     </div>
                     <Sparkline values={a.samples} positive={a.change >= 0} />
@@ -773,7 +779,19 @@ export default function Dashboard() {
                           {t.symbol}
                         </span>
                       </td>
-                      <td className="trade-id">{t.id}</td>
+                      <td className="trade-id">
+                        <button
+                          className="trade-inspect"
+                          aria-label={`Inspect trade ${t.id}`}
+                          onClick={() => {
+                            replay.pause();
+                            setSelectedTrade(t);
+                            setModal("trade");
+                          }}
+                        >
+                          {t.id}
+                        </button>
+                      </td>
                       <td className="muted">{t.client}</td>
                       <td>
                         <span className={`side-pill ${t.side.toLowerCase()}`}>
@@ -923,11 +941,13 @@ export default function Dashboard() {
         <dialog
           ref={dialog}
           aria-label={
-            modal === "pull"
-              ? "Import trades"
-              : modal === "progress"
-                ? "Import progress"
-                : "How Folio works"
+            modal === "trade"
+              ? "Trade details"
+              : modal === "pull"
+                ? "Import trades"
+                : modal === "progress"
+                  ? "Import progress"
+                  : "How Folio works"
           }
           className="modal"
           data-liquid-glass
@@ -952,7 +972,20 @@ export default function Dashboard() {
               <X size={20} />
             </button>
           </div>
-          {modal === "progress" ? (
+          {modal === "trade" && selectedTrade ? (
+            <TradeDetails
+              trade={selectedTrade}
+              trades={sessionTrades}
+              onClient={(client) => {
+                setModal(null);
+                setQuery(client);
+                setSymbol("All symbols");
+                setSide("All sides");
+                setPage(0);
+                scrollToSection("trades");
+              }}
+            />
+          ) : modal === "progress" ? (
             <>
               {progressPull && (
                 <ImportProgress pull={progressPull} connected={connected} />

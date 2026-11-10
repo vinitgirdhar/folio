@@ -1,0 +1,113 @@
+.trade-inspect {
+  padding: 3px 0;
+  color: var(--blue);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s;
+}
+.trade-inspect:hover {
+  text-decoration-color: currentColor;
+}
+.trade-detail-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.trade-detail-heading h2 {
+  margin: 0;
+}
+.trade-details-side {
+  padding: 5px 9px;
+  border-radius: 7px;
+  color: var(--green);
+  background: var(--green-soft);
+  font-size: 11px;
+}
+.trade-details-side[data-side="SELL"] {
+  color: var(--red);
+  background: var(--red-soft);
+}
+.trade-details dl {
+  margin: 0;
+}
+.trade-details dt {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.trade-details dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.trade-detail-identifiers {
+  display: grid;
+  gap: 13px;
+  padding-bottom: 20px;
+}
+.trade-detail-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+  padding: 19px;
+  border-radius: 15px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+}
+.trade-detail-notional {
+  grid-column: 1 / -1;
+}
+.trade-detail-notional dd {
+  font-size: 26px;
+  letter-spacing: -0.7px;
+}
+.trade-detail-context {
+  margin: 22px 0;
+}
+.trade-detail-context h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 550;
+}
+.modal .trade-detail-context p {
+  margin: 7px 0 16px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.trade-detail-context dl {
+  display: grid;
+  gap: 12px;
+}
+.trade-detail-context dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+}
+.trade-detail-context dd {
+  margin: 0;
+  text-align: right;
+  font-size: 12px;
+}
+.modal .trade-detail-context dl + p {
+  margin-bottom: 0;
+}
+.trade-details > button {
+  gap: 8px;
+}
+@media (max-width: 380px) {
+  .trade-detail-values {
+    padding: 14px;
+    gap: 14px;
+  }
+  .trade-detail-notional dd {
+    font-size: 23px;
+  }
+}
